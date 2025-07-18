@@ -1,0 +1,59 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {},
+      "disabled": true,
+      "autoApprove": []
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "resolve_library_id",
+        "get_library_docs",
+        "resolve-library-id",
+        "get-library-docs"
+      ]
+    },
+    "chrome-mcp-stdio": {
+      "command": "npx",
+      "args": [
+        "node",
+        "E:/nodejs/node_global/node_modules/mcp-chrome-bridge/dist/mcp/mcp-server-stdio.js"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "chrome_navigate",
+        "chrome_screenshot",
+        "chrome_get_web_content"
+      ]
+    },
+    "GitHub": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "%GITHUB_TOKEN%"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "search_repositories",
+        "create_repository",
+        "get_file_contents",
+        "push_files",
+        "create_issue",
+        "list_issues"
+      ]
+    }
+  }
+}

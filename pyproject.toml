@@ -1,0 +1,249 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chess-ai-kiro"
+version = "0.1.0"
+description = "中国象棋AI系统 - 基于深度学习的棋盘识别、AI引擎和实时分析系统"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Chess AI Kiro Team", email = "team@chess-ai-kiro.com"}
+]
+maintainers = [
+    {name = "Chess AI Kiro Team", email = "team@chess-ai-kiro.com"}
+]
+keywords = ["chess", "ai", "computer-vision", "deep-learning", "pytorch", "yolo"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Games/Entertainment :: Board Games",
+    "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
+]
+requires-python = ">=3.9"
+dependencies = [
+    # 深度学习框架
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "torchaudio>=2.0.0",
+    
+    # 计算机视觉
+    "ultralytics>=8.0.0",  # YOLO11
+    "opencv-python>=4.8.0",
+    "Pillow>=9.0.0",
+    
+    # 数据处理
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+    
+    # 机器学习工具
+    "scikit-learn>=1.3.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    
+    # Web框架和API
+    "fastapi>=0.100.0",
+    "uvicorn>=0.23.0",
+    "pydantic>=2.0.0",
+    
+    # 配置管理
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    
+    # 数据存储
+    "h5py>=3.8.0",
+    
+    # 日志和监控
+    "loguru>=0.7.0",
+    "tqdm>=4.65.0",
+    
+    # 图像处理和GUI
+    "pyautogui>=0.9.54",
+    "mss>=9.0.1",  # 屏幕截图
+    
+    # 工具库
+    "click>=8.1.0",  # 命令行界面
+    "rich>=13.0.0",  # 美化终端输出
+]
+
+[project.optional-dependencies]
+dev = [
+    # 测试框架
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.11.0",
+    
+    # 代码质量
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.3.0",
+    
+    # 文档
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    
+    # 开发工具
+    "jupyter>=1.0.0",
+    "ipython>=8.14.0",
+    "notebook>=7.0.0",
+]
+
+gpu = [
+    # GPU加速版本的PyTorch（用户需要根据CUDA版本选择）
+    # 注意：这些依赖可能需要用户手动安装特定版本
+    "torch[cuda]>=2.0.0",
+    "torchvision[cuda]>=0.15.0",
+    "torchaudio[cuda]>=2.0.0",
+]
+
+onnx = [
+    # ONNX模型导出和推理
+    "onnx>=1.14.0",
+    "onnxruntime>=1.15.0",
+    "onnxruntime-gpu>=1.15.0",
+]
+
+tensorrt = [
+    # TensorRT加速推理
+    "tensorrt>=8.6.0",
+    "pycuda>=2022.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/chess-ai-kiro/chess-ai-kiro"
+Documentation = "https://chess-ai-kiro.readthedocs.io/"
+Repository = "https://github.com/chess-ai-kiro/chess-ai-kiro.git"
+"Bug Tracker" = "https://github.com/chess-ai-kiro/chess-ai-kiro/issues"
+
+[project.scripts]
+chess-ai-kiro = "chess_ai_project.main:main"
+chess-board-recognition = "chess_ai_project.src.chess_board_recognition.main:main"
+chess-ai-engine = "chess_ai_project.src.chinese_chess_ai_engine.main:main"
+real-time-analysis = "chess_ai_project.src.real_time_analysis_system.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["chess_ai_project*"]
+exclude = ["tests*", "docs*", "*.egg-info"]
+
+[tool.setuptools.package-data]
+"chess_ai_project" = [
+    "configs/*.yaml",
+    "configs/*.json",
+    "data/models/*.pt",
+    "data/models/*.onnx",
+    "data/configs/*.yaml",
+]
+
+# 代码格式化配置
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # 排除的目录
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# 导入排序配置
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["chess_ai_project"]
+known_third_party = [
+    "torch", "torchvision", "ultralytics", "opencv", "numpy", "pandas",
+    "fastapi", "pydantic", "yaml", "h5py", "loguru", "tqdm", "click", "rich"
+]
+
+# 类型检查配置
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "cv2.*",
+    "ultralytics.*",
+    "mss.*",
+    "pyautogui.*",
+]
+ignore_missing_imports = true
+
+# 测试配置
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "gpu: marks tests that require GPU",
+]
+
+# 覆盖率配置
+[tool.coverage.run]
+source = ["chess_ai_project"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/.*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
