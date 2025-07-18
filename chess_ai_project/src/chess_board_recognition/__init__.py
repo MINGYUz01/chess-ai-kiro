@@ -1,19 +1,41 @@
 """
-棋盘识别系统
+棋盘识别系统 - 基于YOLO11的中国象棋棋局识别
 
-基于YOLO11的计算机视觉系统，用于识别屏幕上的中国象棋棋局。
-包括数据收集工具、数据标注支持、模型训练和实时识别功能。
+该模块提供完整的棋盘识别解决方案，包括：
+- 数据收集和标注支持
+- YOLO11模型训练
+- 实时棋局识别和状态输出
+- 系统配置和监控
 """
 
 __version__ = "0.1.0"
+__author__ = "Chess AI Kiro Team"
 
-# 主要组件将在后续实现时导入
-# from .data_collection import ScreenCapture, RegionSelector
-# from .data_processing import DataManager, AnnotationValidator
-# from .training import YOLO11Trainer, HyperparameterOptimizer
-# from .inference import ChessboardDetector, ResultProcessor
-# from .system_management import ConfigManager, PerformanceMonitor
+# 导入核心组件
+from .core.interfaces import (
+    ChessboardDetector,
+    Detection,
+    BoardState,
+    ChessboardRecognitionError,
+    ModelLoadError,
+    InferenceError,
+    DataValidationError,
+)
+
+from .core.config import ConfigManager
+from .core.logger import setup_logger
 
 __all__ = [
-    "__version__",
+    # 核心接口
+    "ChessboardDetector",
+    "Detection", 
+    "BoardState",
+    # 异常类
+    "ChessboardRecognitionError",
+    "ModelLoadError", 
+    "InferenceError",
+    "DataValidationError",
+    # 工具类
+    "ConfigManager",
+    "setup_logger",
 ]

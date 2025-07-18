@@ -17,9 +17,17 @@ function Show-Help {
     Write-Host "  lint         - 运行代码检查"
     Write-Host "  format       - 格式化代码"
     Write-Host "  clean        - 清理临时文件"
+    Write-Host ""
+    Write-Host "棋盘识别系统:" -ForegroundColor Cyan
+    Write-Host "  capture      - 启动屏幕截图工具"
+    Write-Host "  demo-capture - 运行截图功能演示"
     Write-Host "  run-board    - 运行棋盘识别系统"
+    Write-Host ""
+    Write-Host "其他模块:" -ForegroundColor Cyan
     Write-Host "  run-ai       - 运行AI引擎"
     Write-Host "  run-analysis - 运行实时分析系统"
+    Write-Host ""
+    Write-Host "工具命令:" -ForegroundColor Cyan
     Write-Host "  check        - 运行所有检查"
     Write-Host "  release      - 发布准备"
     Write-Host ""
@@ -102,6 +110,16 @@ function Clean-Files {
     Write-Host "清理完成!" -ForegroundColor Green
 }
 
+function Start-Capture {
+    Write-Host "启动屏幕截图工具..." -ForegroundColor Green
+    chess-board-recognition capture
+}
+
+function Run-DemoCapture {
+    Write-Host "运行截图功能演示..." -ForegroundColor Green
+    python -m chess_ai_project.src.chess_board_recognition.data_collection.demo_capture
+}
+
 function Run-BoardRecognition {
     Write-Host "启动棋盘识别系统..." -ForegroundColor Green
     chess-board-recognition --mode inference
@@ -141,6 +159,8 @@ switch ($Command.ToLower()) {
     "lint" { Run-Lint }
     "format" { Format-Code }
     "clean" { Clean-Files }
+    "capture" { Start-Capture }
+    "demo-capture" { Run-DemoCapture }
     "run-board" { Run-BoardRecognition }
     "run-ai" { Run-AIEngine }
     "run-analysis" { Run-RealTimeAnalysis }

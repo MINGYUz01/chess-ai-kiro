@@ -1,0 +1,83 @@
+# 棋盘识别系统配置文件
+
+# 模型配置
+model:
+  path: "./models/best.pt"
+  confidence_threshold: 0.5
+  nms_threshold: 0.4
+  device: "auto"  # auto, cpu, cuda
+  input_size: 640
+
+# 截图配置
+capture:
+  region: [0, 0, 800, 600]  # x, y, width, height
+  auto_interval: 2  # 自动截图间隔（秒）
+  save_path: "./data/captures"
+  format: "jpg"
+  quality: 95
+  max_storage_gb: 10  # 最大存储空间（GB）
+
+# 训练配置
+training:
+  epochs: 100
+  batch_size: 16
+  learning_rate: 0.001
+  image_size: 640
+  device: "auto"
+  workers: 4
+  patience: 50  # 早停耐心值
+  save_period: 10  # 模型保存间隔
+
+# 数据处理配置
+data:
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  augmentation:
+    enabled: true
+    rotation: 15  # 旋转角度范围
+    scale: 0.2    # 缩放范围
+    brightness: 0.2  # 亮度调整范围
+    contrast: 0.2    # 对比度调整范围
+
+# 类别定义
+classes:
+  - "board"           # 0: 棋盘边界
+  - "grid_lines"      # 1: 网格线
+  - "red_king"        # 2: 红帅
+  - "red_advisor"     # 3: 红仕
+  - "red_bishop"      # 4: 红相
+  - "red_knight"      # 5: 红马
+  - "red_rook"        # 6: 红车
+  - "red_cannon"      # 7: 红炮
+  - "red_pawn"        # 8: 红兵
+  - "black_king"      # 9: 黑将
+  - "black_advisor"   # 10: 黑士
+  - "black_bishop"    # 11: 黑象
+  - "black_knight"    # 12: 黑马
+  - "black_rook"      # 13: 黑车
+  - "black_cannon"    # 14: 黑炮
+  - "black_pawn"      # 15: 黑卒
+  - "selected_piece"  # 16: 选中状态
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "./logs/chess_board_recognition.log"
+  max_size: "10MB"
+  backup_count: 5
+  console_output: true
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+
+# 性能监控配置
+monitoring:
+  enabled: true
+  metrics_file: "./logs/performance_metrics.json"
+  report_interval: 60  # 报告间隔（秒）
+  max_inference_time: 100  # 最大推理时间（毫秒）
+
+# 系统配置
+system:
+  max_memory_usage: "2GB"
+  temp_dir: "./temp"
+  cleanup_interval: 3600  # 清理间隔（秒）

@@ -13,11 +13,13 @@ Chess AI Kiro 是一个综合性的中国象棋AI系统，由三个核心模块�
 ## 🚀 主要特性
 
 ### 棋盘识别系统
-- 🖼️ 屏幕截图和区域选择
-- 🏷️ 支持labelImg数据标注
-- 🤖 YOLO11模型训练和推理
-- ⚡ 单张图像识别时间 < 100ms
-- 📊 输出标准化的10x9棋局矩阵
+- 🖼️ **智能屏幕截图** - 图形界面区域选择，支持自动/手动截图
+- 📁 **文件管理** - 按日期自动分类存储，时间戳命名
+- 💾 **存储监控** - 实时监控磁盘空间，防止存储溢出
+- 🏷️ **数据标注** - 支持labelImg标注，17种棋子类别识别
+- 🤖 **YOLO11训练** - 模型训练和推理，支持GPU加速
+- ⚡ **高性能** - 单张图像识别时间 < 100ms
+- 📊 **标准输出** - 10x9棋局矩阵，包含选中状态
 
 ### 象棋AI引擎
 - 🧠 基于AlphaZero架构的神经网络
@@ -197,29 +199,72 @@ nvidia-smi
 
 #### 阶段1: 棋盘识别系统
 
-##### 1.1 数据收集 (Windows)
-```powershell
-# 启动数据收集工具
-chess-board-recognition --mode collect --region-select
+##### 1.1 数据收集 - 屏幕截图工具
 
-# 或使用脚本
-.\scripts.ps1 run-board
-```
-
-##### 1.1 数据收集 (Linux/macOS)
+**启动截图工具：**
 ```bash
-# 启动数据收集工具
-chess-board-recognition --mode collect --region-select
+# 启动交互式截图工具
+chess-board-recognition capture
 
-# 或使用Makefile
-make run-board
+# 使用自定义配置
+chess-board-recognition capture --config my_config.yaml
+
+# 启用详细日志
+chess-board-recognition capture --verbose
 ```
 
-**操作步骤：**
-1. 运行命令后会出现区域选择界面
-2. 用鼠标框选象棋棋盘区域
-3. 设置自动截图间隔（推荐2-5秒）
-4. 开始收集训练数据
+**截图工具功能菜单：**
+```
+截图工具选项:
+1. 选择截图区域    # 图形界面选择棋盘区域
+2. 手动截图        # 立即截取一张图片
+3. 开始自动截图    # 定时自动截图
+4. 查看统计信息    # 显示截图数量和存储状态
+5. 退出
+```
+
+**详细操作步骤：**
+
+1. **选择截图区域**
+   ```bash
+   # 选择选项1后会出现：
+   # - 全屏透明覆盖层
+   # - 用鼠标拖拽选择棋盘区域
+   # - 按ESC取消，按Enter确认
+   # - 区域会自动保存供后续使用
+   ```
+
+2. **手动截图**
+   ```bash
+   # 选择选项2立即截取当前区域
+   # 文件自动保存到 data/captures/日期/screenshot_时间戳.jpg
+   ```
+
+3. **自动截图**
+   ```bash
+   # 选择选项3，输入截图间隔（秒）
+   # 推荐间隔：2-5秒
+   # 按Ctrl+C停止自动截图
+   ```
+
+4. **查看统计**
+   ```bash
+   # 显示：截图数量、文件大小、磁盘使用率等
+   ```
+
+**高级用法：**
+```bash
+# 运行演示脚本
+python -m chess_ai_project.src.chess_board_recognition.data_collection.demo_capture
+
+# 直接使用Python API
+python -c "
+from chess_ai_project.src.chess_board_recognition.data_collection import ScreenCaptureImpl
+capture = ScreenCaptureImpl('./configs/chess_board_recognition.yaml')
+filepath = capture.manual_capture()
+print(f'截图保存至: {filepath}')
+"
+```
 
 ##### 1.2 数据标注
 ```bash

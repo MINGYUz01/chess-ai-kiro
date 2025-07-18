@@ -1,7 +1,7 @@
 # Chess AI Kiro Makefile
 # 提供常用的开发命令
 
-.PHONY: help install install-dev test lint format clean run-board run-ai run-analysis
+.PHONY: help install install-dev test lint format clean capture demo-capture run-board run-ai run-analysis
 
 # 默认目标
 help:
@@ -14,7 +14,13 @@ help:
 	@echo "  lint         - 运行代码检查"
 	@echo "  format       - 格式化代码"
 	@echo "  clean        - 清理临时文件"
+	@echo ""
+	@echo "棋盘识别系统:"
+	@echo "  capture      - 启动屏幕截图工具"
+	@echo "  demo-capture - 运行截图功能演示"
 	@echo "  run-board    - 运行棋盘识别系统"
+	@echo ""
+	@echo "其他模块:"
 	@echo "  run-ai       - 运行AI引擎"
 	@echo "  run-analysis - 运行实时分析系统"
 
@@ -52,6 +58,14 @@ clean:
 	rm -rf .coverage
 	rm -rf .pytest_cache/
 	rm -rf .mypy_cache/
+
+# 启动屏幕截图工具
+capture:
+	chess-board-recognition capture
+
+# 运行截图功能演示
+demo-capture:
+	python -m chess_ai_project.src.chess_board_recognition.data_collection.demo_capture
 
 # 运行棋盘识别系统
 run-board:
