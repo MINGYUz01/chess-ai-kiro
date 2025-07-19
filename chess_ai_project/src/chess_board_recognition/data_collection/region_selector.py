@@ -6,11 +6,17 @@
 
 import json
 import time
-import tkinter as tk
-from tkinter import messagebox, simpledialog
 from typing import Tuple, Optional
 from pathlib import Path
 import pyautogui
+
+try:
+    import tkinter as tk
+    from tkinter import messagebox, simpledialog
+    GUI_AVAILABLE = True
+except ImportError:
+    GUI_AVAILABLE = False
+    print("警告: tkinter不可用，将使用控制台输入模式")
 
 from ..core.logger import LoggerMixin
 
@@ -30,16 +36,34 @@ class RegionSelector(LoggerMixin):
         self.log_info("显示区域选择界面")
         
         try:
+            # 检查是否可以创建GUI界面
+            if not GUI_AVAILABLE:
+                raise ImportError("tkinter不可用")
+                
+            import tkinter as tk
+            from tkinter import messagebox
+            
             # 创建全屏透明窗口
             root = tk.Tk()
             root.title("区域选择器")
-            root.attributes('-fullscreen', True)
-            root.attributes('-alpha', 0.3)  # 设置透明度
-            root.configure(bg='black')
+            
+            # 设置窗口属性
+            try:
+                root.attributes('-fullscreen', True)
+                root.attributes('-alpha', 0.3)  # 设置透明度
+                root.configure(bg='black')
+                root.attributes('-topmost', True)  # 置顶显示
+            except tk.TclError as e:
+                self.log_warning(f"设置窗口属性失败: {e}")
+                # 如果全屏失败，使用普通窗口
+                root.state('zoomed')  # Windows下最大化
+                root.configure(bg='black')
             
             # 获取屏幕尺寸
             screen_width = root.winfo_screenwidth()
             screen_height = root.winfo_screenheight()
+            
+            self.log_info(f"屏幕尺寸: {screen_width}x{screen_height}")
             
             # 创建画布
             canvas = tk.Canvas(
@@ -47,9 +71,10 @@ class RegionSelector(LoggerMixin):
                 width=screen_width, 
                 height=screen_height,
                 bg='black',
-                highlightthickness=0
+                highlightthickness=0,
+                cursor='crosshair'
             )
-            canvas.pack()
+            canvas.pack(fill='both', expand=True)
             
             # 选择状态变量
             self.start_x = 0
@@ -66,6 +91,8 @@ class RegionSelector(LoggerMixin):
                 # 删除之前的矩形
                 if self.rect_id:
                     canvas.delete(self.rect_id)
+                
+                self.log_debug(f"开始选择: ({self.start_x}, {self.start_y})")
             
             def on_mouse_drag(event):
                 """鼠标拖拽事件"""
@@ -90,21 +117,30 @@ class RegionSelector(LoggerMixin):
                     x2, y2 = max(self.start_x, event.x), max(self.start_y, event.y)
                     width, height = x2 - x1, y2 - y1
                     
+                    self.log_info(f"选择完成: ({x1}, {y1}, {width}, {height})")
+                    
                     # 验证区域大小
                     if width > 10 and height > 10:
                         self.selected_region = (x1, y1, width, height)
                         self.log_info(f"选择区域: {self.selected_region}")
                         root.quit()
                     else:
-                        messagebox.showwarning("警告", "选择区域太小，请重新选择")
+                        self.log_warning("选择区域太小，请重新选择")
+                        try:
+                            messagebox.showwarning("警告", "选择区域太小，请重新选择")
+                        except Exception as e:
+                            self.log_warning(f"显示警告对话框失败: {e}")
             
             def on_key_press(event):
                 """键盘事件"""
+                self.log_debug(f"按键: {event.keysym}")
                 if event.keysym == 'Escape':
+                    self.log_info("用户取消选择")
                     root.quit()
                 elif event.keysym == 'Return':
                     # 使用当前选择的区域
                     if self.selected_region:
+                        self.log_info("用户确认选择")
                         root.quit()
             
             # 绑定事件
@@ -121,12 +157,39 @@ class RegionSelector(LoggerMixin):
                 fill='white', font=('Arial', 16)
             )
             
+            # 添加额外的说明
+            canvas.create_text(
+                screen_width // 2, 100,
+                text="选择完成后会自动关闭此窗口",
+                fill='yellow', font=('Arial', 12)
+            )
+            
+            self.log_info("开始GUI事件循环")
+            
+            # 设置超时机制，避免无限等待
+            def timeout_handler():
+                self.log_warning("区域选择超时，使用默认区域")
+                root.quit()
+            
+            # 30秒超时
+            root.after(30000, timeout_handler)
+            
             # 运行界面
             root.mainloop()
-            root.destroy()
+            
+            self.log_info("GUI事件循环结束")
+            
+            try:
+                root.destroy()
+            except Exception as e:
+                self.log_warning(f"销毁窗口失败: {e}")
             
         except Exception as e:
             self.log_error(f"显示选择界面失败: {e}")
+            # 如果GUI失败，提供控制台输入选项
+            print(f"GUI界面启动失败: {e}")
+            print("将使用控制台输入模式")
+            self.selected_region = self.get_region_with_console_input()
     
     def get_selected_region(self) -> Tuple[int, int, int, int]:
         """
@@ -139,26 +202,35 @@ class RegionSelector(LoggerMixin):
         
         # 首先尝试加载已保存的配置
         saved_region = self.load_region_config()
+        self.log_info(f"加载区域配置: {saved_region}")
         
         # 询问用户是否使用已保存的区域
         if saved_region != (0, 0, 800, 600):  # 不是默认值
             try:
-                root = tk.Tk()
-                root.withdraw()  # 隐藏主窗口
+                # 使用控制台询问而不是GUI对话框，避免GUI阻塞问题
+                print(f"\n发现已保存的区域配置: {saved_region}")
+                print("1. 使用已保存的区域配置")
+                print("2. 重新选择区域")
+                print("3. 手动输入区域坐标")
                 
-                use_saved = messagebox.askyesno(
-                    "区域选择",
-                    f"发现已保存的区域配置: {saved_region}\n是否使用此配置？\n\n选择'否'将重新选择区域"
-                )
-                
-                root.destroy()
-                
-                if use_saved:
-                    self.log_info(f"使用已保存的区域: {saved_region}")
-                    return saved_region
+                while True:
+                    choice = input("请选择 (1-3): ").strip()
                     
+                    if choice == '1':
+                        self.log_info(f"使用已保存的区域: {saved_region}")
+                        return saved_region
+                    elif choice == '2':
+                        break  # 继续到区域选择界面
+                    elif choice == '3':
+                        return self.get_region_with_dialog()
+                    else:
+                        print("无效选择，请输入 1-3")
+                        
             except Exception as e:
-                self.log_warning(f"显示确认对话框失败: {e}")
+                self.log_warning(f"用户选择失败: {e}")
+                # 发生错误时直接使用已保存的区域
+                self.log_info(f"使用已保存的区域: {saved_region}")
+                return saved_region
         
         # 显示区域选择界面
         self.show_selection_overlay()
@@ -228,6 +300,63 @@ class RegionSelector(LoggerMixin):
             self.log_error(f"加载区域配置失败: {e}")
             return (0, 0, 800, 600)
     
+    def get_region_with_console_input(self) -> Tuple[int, int, int, int]:
+        """
+        通过控制台输入获取区域坐标
+        
+        Returns:
+            区域坐标
+        """
+        try:
+            # 获取屏幕尺寸作为参考
+            screen_width, screen_height = pyautogui.size()
+            print(f"\n屏幕尺寸: {screen_width} x {screen_height}")
+            print("请输入截图区域坐标:")
+            
+            while True:
+                try:
+                    x = int(input(f"X坐标 (0-{screen_width}): "))
+                    if 0 <= x <= screen_width:
+                        break
+                    print(f"X坐标必须在 0-{screen_width} 范围内")
+                except ValueError:
+                    print("请输入有效的数字")
+            
+            while True:
+                try:
+                    y = int(input(f"Y坐标 (0-{screen_height}): "))
+                    if 0 <= y <= screen_height:
+                        break
+                    print(f"Y坐标必须在 0-{screen_height} 范围内")
+                except ValueError:
+                    print("请输入有效的数字")
+            
+            while True:
+                try:
+                    width = int(input(f"宽度 (1-{screen_width-x}): "))
+                    if 1 <= width <= screen_width-x:
+                        break
+                    print(f"宽度必须在 1-{screen_width-x} 范围内")
+                except ValueError:
+                    print("请输入有效的数字")
+            
+            while True:
+                try:
+                    height = int(input(f"高度 (1-{screen_height-y}): "))
+                    if 1 <= height <= screen_height-y:
+                        break
+                    print(f"高度必须在 1-{screen_height-y} 范围内")
+                except ValueError:
+                    print("请输入有效的数字")
+            
+            region = (x, y, width, height)
+            self.log_info(f"通过控制台设置区域: {region}")
+            return region
+            
+        except Exception as e:
+            self.log_error(f"控制台输入失败: {e}")
+            return (0, 0, 800, 600)
+
     def get_region_with_dialog(self) -> Tuple[int, int, int, int]:
         """
         通过对话框获取区域坐标
@@ -236,6 +365,10 @@ class RegionSelector(LoggerMixin):
             区域坐标
         """
         try:
+            if not GUI_AVAILABLE:
+                self.log_warning("GUI不可用，使用控制台输入")
+                return self.get_region_with_console_input()
+                
             root = tk.Tk()
             root.withdraw()
             
