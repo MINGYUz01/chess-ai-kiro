@@ -21,8 +21,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 使用示例:
-  # 启动截图工具
+  # 启动截图工具（命令行模式）
   python -m chess_ai_project.src.chess_board_recognition.main capture
+
+  # 启动截图工具（GUI模式）
+  python -m chess_ai_project.src.chess_board_recognition.main capture-gui
 
   # 训练模型
   python -m chess_ai_project.src.chess_board_recognition.main train --data data.yaml --epochs 100
@@ -37,7 +40,7 @@ def main():
     
     parser.add_argument(
         "command",
-        choices=["capture", "train", "predict", "validate", "export"],
+        choices=["capture", "capture-gui", "train", "predict", "validate", "export"],
         help="要执行的命令"
     )
     
@@ -109,6 +112,8 @@ def main():
         # 根据命令执行相应功能
         if args.command == "capture":
             run_capture(config, args, logger)
+        elif args.command == "capture-gui":
+            run_capture_gui(config, args, logger)
         elif args.command == "train":
             run_training(config, args, logger)
         elif args.command == "predict":
@@ -215,6 +220,31 @@ def run_capture(config, args, logger):
     except Exception as e:
         logger.error(f"截图工具启动失败: {e}")
         print(f"错误: {e}")
+
+
+def run_capture_gui(config, args, logger):
+    """运行截图GUI界面"""
+    logger.info("启动截图GUI界面...")
+    
+    try:
+        from .data_collection.capture_gui import launch_capture_gui
+        
+        print("启动截图GUI界面...")
+        print("GUI界面将提供可视化的截图控制功能")
+        
+        # 启动GUI界面
+        launch_capture_gui(args.config)
+        
+    except ImportError as e:
+        logger.error(f"GUI依赖库不可用: {e}")
+        print(f"错误: GUI功能需要tkinter和PIL库支持")
+        print("请安装必要的依赖: pip install pillow")
+        print("如果tkinter不可用，请使用命令行模式: capture")
+        
+    except Exception as e:
+        logger.error(f"截图GUI启动失败: {e}")
+        print(f"错误: {e}")
+        print("如果GUI启动失败，请使用命令行模式: capture")
 
 
 def run_training(config, args, logger):

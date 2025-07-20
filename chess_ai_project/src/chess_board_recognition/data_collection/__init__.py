@@ -11,7 +11,19 @@
 from .screen_capture import ScreenCaptureImpl
 from .region_selector import RegionSelector
 
-__all__ = [
-    "ScreenCaptureImpl",
-    "RegionSelector",
-]
+# GUI功能（可选导入，因为可能缺少GUI依赖）
+try:
+    from .capture_gui import CaptureGUI, launch_capture_gui
+    GUI_AVAILABLE = True
+    __all__ = [
+        "ScreenCaptureImpl",
+        "RegionSelector",
+        "CaptureGUI",
+        "launch_capture_gui",
+    ]
+except ImportError:
+    GUI_AVAILABLE = False
+    __all__ = [
+        "ScreenCaptureImpl",
+        "RegionSelector",
+    ]

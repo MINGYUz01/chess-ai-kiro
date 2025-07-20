@@ -17,6 +17,7 @@
 
 ### 启动截图工具
 
+**命令行模式：**
 ```bash
 # 使用默认配置启动
 chess-board-recognition capture
@@ -28,15 +29,30 @@ chess-board-recognition capture --config my_config.yaml
 chess-board-recognition capture --verbose
 ```
 
+**GUI模式（推荐）：**
+```bash
+# 启动GUI界面
+chess-board-recognition capture-gui
+
+# 使用自定义配置启动GUI
+chess-board-recognition capture-gui --config my_config.yaml
+
+# 或者使用快捷启动脚本
+python chess_ai_project\src\chess_board_recognition\data_collection\launch_capture_gui.py
+```
+
 ### 使用脚本启动
 
 **Windows用户：**
-```powershell
-# 启动截图工具
-.\scripts.ps1 capture
+```cmd
+REM 启动GUI界面（推荐）
+启动截屏GUI.bat
 
-# 运行演示
-.\scripts.ps1 demo-capture
+REM 或者使用Python命令
+python chess_ai_project\src\chess_board_recognition\data_collection\launch_capture_gui.py
+
+REM 命令行模式
+python -m chess_ai_project.src.chess_board_recognition.main capture
 ```
 
 **Linux/macOS用户：**
@@ -48,9 +64,28 @@ make capture
 make demo-capture
 ```
 
-## 📋 功能菜单详解
+## 📋 功能详解
 
-启动截图工具后，会显示以下功能菜单：
+### GUI界面模式（推荐）
+
+启动GUI界面后，你将看到一个直观的可视化控制面板：
+
+**主要功能区域：**
+- **控制面板**：包含所有操作按钮和设置选项
+- **预览面板**：实时显示截屏区域的预览图像
+- **统计信息**：显示详细的截屏统计和系统状态
+- **状态栏**：显示当前操作状态和时间信息
+
+**GUI界面优势：**
+- 🖼️ **实时预览** - 可以看到截屏区域的实时画面
+- 🎛️ **可视化控制** - 所有功能都有对应的按钮，操作直观
+- 📊 **实时统计** - 统计信息自动更新，无需手动查询
+- 🔄 **自动截屏监控** - 自动截屏时可以实时查看状态和停止
+- 💾 **预览保存** - 可以直接保存当前预览图像
+
+### 命令行模式
+
+启动命令行模式后，会显示以下功能菜单：
 
 ```
 截图工具选项:
