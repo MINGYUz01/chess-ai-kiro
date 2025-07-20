@@ -65,7 +65,7 @@ Chess AI Kiro 是一个综合性的中国象棋AI系统，由三个核心模块�
 pip install uv
 
 # 2. 克隆项目
-git clone https://github.com/chess-ai-kiro/chess-ai-kiro.git
+git clone https://github.com/MINGYUz01/chess-ai-kiro.git
 cd chess-ai-kiro
 
 # 3. 创建虚拟环境
@@ -74,8 +74,8 @@ uv venv
 # 4. 激活虚拟环境
 .venv\Scripts\activate
 
-# 5. 安装项目依赖（使用国内镜像加速）
-uv pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+# 5. 安装项目依赖（已配置国内镜像加速）
+uv pip install -r requirements.txt
 
 # 6. 安装项目本身
 uv pip install -e .
@@ -91,7 +91,7 @@ chess-ai-kiro info
 pip install uv
 
 # 2. 克隆项目
-git clone https://github.com/chess-ai-kiro/chess-ai-kiro.git
+git clone https://github.com/MINGYUz01/chess-ai-kiro.git
 cd chess-ai-kiro
 
 # 3. 创建虚拟环境
@@ -166,8 +166,11 @@ conda install -c conda-forge uv
 
 #### 问题2: 网络连接超时
 ```bash
-# 解决方案：使用国内镜像源
-uv pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+# 解决方案：项目已默认配置国内镜像源
+# 如果仍然遇到问题，可以尝试其他镜像源
+uv pip install -i https://mirrors.aliyun.com/pypi/simple -r requirements.txt
+# 或者
+uv pip install -i https://pypi.mirrors.ustc.edu.cn/simple -r requirements.txt
 ```
 
 #### 问题3: CUDA版本不匹配
@@ -391,7 +394,7 @@ make help
 #### 场景1: 开发者首次使用
 ```bash
 # 1. 安装环境
-git clone https://github.com/chess-ai-kiro/chess-ai-kiro.git
+git clone https://github.com/MINGYUz01/chess-ai-kiro.git
 cd chess-ai-kiro
 uv venv && .venv\Scripts\activate  # Windows
 uv pip install -e .
@@ -571,8 +574,8 @@ mypy chess_ai_project/
 
 ## 📞 联系我们
 
-- 项目主页: [https://github.com/chess-ai-kiro/chess-ai-kiro](https://github.com/chess-ai-kiro/chess-ai-kiro)
-- 问题反馈: [https://github.com/chess-ai-kiro/chess-ai-kiro/issues](https://github.com/chess-ai-kiro/chess-ai-kiro/issues)
+- 项目主页: [https://github.com/MINGYUz01/chess-ai-kiro](https://github.com/MINGYUz01/chess-ai-kiro)
+- 问题反馈: [https://github.com/MINGYUz01/chess-ai-kiro/issues](https://github.com/MINGYUz01/chess-ai-kiro/issues)
 - 邮箱: team@chess-ai-kiro.com
 
 ---

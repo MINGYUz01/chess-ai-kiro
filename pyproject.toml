@@ -124,10 +124,10 @@ tensorrt = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/chess-ai-kiro/chess-ai-kiro"
+Homepage = "https://github.com/MINGYUz01/chess-ai-kiro"
 Documentation = "https://chess-ai-kiro.readthedocs.io/"
-Repository = "https://github.com/chess-ai-kiro/chess-ai-kiro.git"
-"Bug Tracker" = "https://github.com/chess-ai-kiro/chess-ai-kiro/issues"
+Repository = "https://github.com/MINGYUz01/chess-ai-kiro.git"
+"Bug Tracker" = "https://github.com/MINGYUz01/chess-ai-kiro/issues"
 
 [project.scripts]
 chess-ai-kiro = "chess_ai_project.main:main"
@@ -208,6 +208,12 @@ module = [
     "pyautogui.*",
 ]
 ignore_missing_imports = true
+
+# 测试配置
+# 包管理器配置
+[tool.uv]
+# 使用清华大学镜像源
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 
 # 测试配置
 [tool.pytest.ini_options]

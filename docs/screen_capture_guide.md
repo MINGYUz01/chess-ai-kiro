@@ -342,9 +342,9 @@ capture:
 
 ## 🔗 相关链接
 
-- [项目主页](https://github.com/chess-ai-kiro/chess-ai-kiro)
+- [项目主页](https://github.com/MINGYUz01/chess-ai-kiro)
 - [完整文档](https://chess-ai-kiro.readthedocs.io/)
-- [问题反馈](https://github.com/chess-ai-kiro/chess-ai-kiro/issues)
+- [问题反馈](https://github.com/MINGYUz01/chess-ai-kiro/issues)
 
 ## 📝 更新日志
 

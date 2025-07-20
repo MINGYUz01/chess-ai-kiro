@@ -1,0 +1,16 @@
+[index]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+verify-ssl = true
+
+[sources]
+# 清华大学镜像源
+tsinghua = { url = "https://pypi.tuna.tsinghua.edu.cn/simple", verify-ssl = true }
+# 阿里云镜像源
+aliyun = { url = "https://mirrors.aliyun.com/pypi/simple", verify-ssl = true }
+# 中国科技大学镜像源
+ustc = { url = "https://pypi.mirrors.ustc.edu.cn/simple", verify-ssl = true }
+# 豆瓣镜像源
+douban = { url = "https://pypi.doubanio.com/simple", verify-ssl = true }
+
+[default-source]
+name = "tsinghua"
