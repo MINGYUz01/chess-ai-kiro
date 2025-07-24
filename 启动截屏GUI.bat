@@ -34,4 +34,4 @@ if errorlevel 1 (
 
 echo.
 echo 程序已退出
-pause
+@REM pause

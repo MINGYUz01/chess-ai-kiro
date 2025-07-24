@@ -63,7 +63,7 @@ classes:
 # 日志配置
 logging:
   level: "INFO"
-  file: "./logs/chess_board_recognition.log"
+  file: "./logs/chess_board_recognition/chess_board_recognition.log"
   max_size: "10MB"
   backup_count: 5
   console_output: true
@@ -72,7 +72,7 @@ logging:
 # 性能监控配置
 monitoring:
   enabled: true
-  metrics_file: "./logs/performance_metrics.json"
+  metrics_file: "./logs/chess_board_recognition/performance_metrics.json"
   report_interval: 60  # 报告间隔（秒）
   max_inference_time: 100  # 最大推理时间（毫秒）
 

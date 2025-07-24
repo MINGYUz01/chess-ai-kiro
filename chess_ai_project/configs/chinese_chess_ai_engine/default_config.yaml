@@ -8,7 +8,7 @@ system:
   log_backup_count: 5
   data_dir: data
   model_dir: models
-  log_dir: logs
+  log_dir: logs/chinese_chess_ai_engine
   temp_dir: temp
   enable_profiling: false
   memory_limit: 2048  # MB

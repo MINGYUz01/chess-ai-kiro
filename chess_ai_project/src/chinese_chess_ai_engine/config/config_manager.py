@@ -31,7 +31,7 @@ class ConfigManager:
     负责加载、保存和管理系统的各种配置。
     """
     
-    def __init__(self, config_dir: str = "configs"):
+    def __init__(self, config_dir: str = "chess_ai_project/configs/chinese_chess_ai_engine"):
         """
         初始化配置管理器
         

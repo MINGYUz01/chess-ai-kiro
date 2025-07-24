@@ -130,7 +130,7 @@ def demo_logger():
         name='demo',
         level='INFO',
         log_file='demo.log',
-        log_dir='chess_ai_project/logs',
+        log_dir='logs/chinese_chess_ai_engine',
         console_output=True
     )
     

@@ -16,7 +16,7 @@ def setup_logger(
     name: str = 'chess_ai',
     level: str = 'INFO',
     log_file: Optional[str] = None,
-    log_dir: str = 'logs',
+    log_dir: str = 'logs/chinese_chess_ai_engine',
     max_size: int = 10,  # MB
     backup_count: int = 5,
     console_output: bool = True
