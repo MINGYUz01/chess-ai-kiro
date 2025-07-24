@@ -1,0 +1,17 @@
+api_host: localhost
+api_key: ''
+api_port: 8000
+api_timeout: 30.0
+api_workers: 1
+data_dir: data
+enable_auth: false
+enable_profiling: false
+log_backup_count: 5
+log_dir: logs
+log_file: chess_ai.log
+log_level: INFO
+log_max_size: 10
+memory_limit: 2048
+model_dir: models
+rate_limit: 100
+temp_dir: temp

@@ -1,0 +1,11 @@
+activation: relu
+attention_dim: 256
+attention_heads: 8
+batch_norm: true
+dropout_rate: 0.1
+hidden_channels: 256
+input_channels: 14
+num_blocks: 20
+policy_head_hidden: 256
+use_attention: true
+value_head_hidden: 256

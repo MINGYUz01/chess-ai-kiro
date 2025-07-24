@@ -1,0 +1,10 @@
+base_time: 300.0
+enable_repetition_draw: true
+increment: 5.0
+max_moves: 300
+opening_moves: 0
+random_opening: false
+save_analysis: false
+save_game_pgn: true
+time_control: fixed
+verbose_output: false

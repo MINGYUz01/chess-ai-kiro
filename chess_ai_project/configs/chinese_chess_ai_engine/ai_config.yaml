@@ -1,0 +1,15 @@
+analysis_depth: 12
+device: auto
+difficulty_level: 5
+endgame_tablebase_path: ''
+hash_size: 128
+max_simulations: 1000
+model_path: ''
+multi_pv: 3
+num_threads: 4
+opening_book_path: ''
+search_time: 5.0
+use_endgame_tablebase: true
+use_onnx: false
+use_opening_book: true
+use_tensorrt: false

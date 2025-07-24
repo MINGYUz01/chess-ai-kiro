@@ -1,0 +1,9 @@
+c_puct: 1.0
+dirichlet_alpha: 0.3
+dirichlet_epsilon: 0.25
+max_depth: 100
+num_simulations: 800
+temperature: 1.0
+time_limit: 5.0
+use_virtual_loss: true
+virtual_loss_value: 3.0

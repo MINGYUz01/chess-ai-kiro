@@ -1,6 +1,10 @@
 # 中国象棋AI引擎实现计划
 
-- [ ] 1. 建立项目结构和核心数据模型
+- [x] 1. 建立项目结构和核心数据模型
+
+
+
+
   - 创建模块化目录结构（rules_engine, neural_network, search_algorithm, training_framework, inference_interface）
   - 定义Move类和ChessBoard类的基础数据结构
   - 实现棋局的多种表示格式转换（矩阵、FEN、坐标记法）

@@ -1,0 +1,15 @@
+batch_size: 32
+evaluation_games: 100
+evaluation_threshold: 0.55
+gradient_clip: 1.0
+keep_checkpoint_count: 5
+learning_rate: 0.001
+lr_scheduler: cosine
+max_training_examples: 500000
+momentum: 0.9
+num_epochs: 100
+save_checkpoint_every: 10
+self_play_games: 1000
+self_play_workers: 4
+training_data_ratio: 0.8
+weight_decay: 0.0001

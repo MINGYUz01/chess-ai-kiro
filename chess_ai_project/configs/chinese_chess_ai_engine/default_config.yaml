@@ -1,0 +1,127 @@
+# 中国象棋AI引擎默认配置文件
+
+# 系统配置
+system:
+  log_level: INFO
+  log_file: chess_ai.log
+  log_max_size: 10  # MB
+  log_backup_count: 5
+  data_dir: data
+  model_dir: models
+  log_dir: logs
+  temp_dir: temp
+  enable_profiling: false
+  memory_limit: 2048  # MB
+  
+  # API服务器配置
+  api_host: localhost
+  api_port: 8000
+  api_workers: 1
+  api_timeout: 30.0
+  
+  # 安全配置
+  enable_auth: false
+  api_key: ""
+  rate_limit: 100  # 请求/分钟
+
+# MCTS搜索配置
+mcts:
+  num_simulations: 800
+  c_puct: 1.0
+  temperature: 1.0
+  dirichlet_alpha: 0.3
+  dirichlet_epsilon: 0.25
+  max_depth: 100
+  time_limit: 5.0
+  use_virtual_loss: true
+  virtual_loss_value: 3.0
+
+# 神经网络模型配置
+model:
+  input_channels: 14
+  num_blocks: 20
+  hidden_channels: 256
+  value_head_hidden: 256
+  policy_head_hidden: 256
+  
+  # 注意力机制
+  use_attention: true
+  attention_heads: 8
+  attention_dim: 256
+  
+  # 正则化
+  dropout_rate: 0.1
+  batch_norm: true
+  activation: relu
+
+# 训练配置
+training:
+  learning_rate: 0.001
+  batch_size: 32
+  num_epochs: 100
+  weight_decay: 0.0001
+  lr_scheduler: cosine
+  momentum: 0.9
+  gradient_clip: 1.0
+  
+  # 自对弈配置
+  self_play_games: 1000
+  self_play_workers: 4
+  
+  # 模型评估配置
+  evaluation_games: 100
+  evaluation_threshold: 0.55
+  
+  # 数据管理
+  max_training_examples: 500000
+  training_data_ratio: 0.8
+  
+  # 检查点配置
+  save_checkpoint_every: 10
+  keep_checkpoint_count: 5
+
+# AI引擎配置
+ai:
+  model_path: ""
+  search_time: 5.0
+  max_simulations: 1000
+  difficulty_level: 5
+  
+  # 开局库和残局库
+  use_opening_book: true
+  use_endgame_tablebase: true
+  opening_book_path: ""
+  endgame_tablebase_path: ""
+  
+  # 分析配置
+  analysis_depth: 12
+  multi_pv: 3
+  
+  # 性能配置
+  num_threads: 4
+  hash_size: 128  # MB
+  
+  # 设备配置
+  device: auto  # cpu, cuda, auto
+  use_tensorrt: false
+  use_onnx: false
+
+# 游戏配置
+game:
+  # 时间控制
+  time_control: fixed  # fixed, increment, tournament
+  base_time: 300.0  # 秒
+  increment: 5.0    # 秒
+  
+  # 游戏规则
+  enable_repetition_draw: true
+  max_moves: 300
+  
+  # 开局设置
+  random_opening: false
+  opening_moves: 0
+  
+  # 调试选项
+  save_game_pgn: true
+  save_analysis: false
+  verbose_output: false
