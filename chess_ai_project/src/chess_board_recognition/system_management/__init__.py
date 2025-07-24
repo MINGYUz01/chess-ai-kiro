@@ -8,10 +8,12 @@
 - 系统状态管理
 """
 
-from .performance_monitor import PerformanceMonitorImpl
+from .logger import setup_logger
 from .model_manager import ModelManager
+from .performance_monitor import PerformanceMonitorImpl
 
 __all__ = [
-    "PerformanceMonitorImpl",
+    "setup_logger",
     "ModelManager",
+    "PerformanceMonitorImpl",
 ]

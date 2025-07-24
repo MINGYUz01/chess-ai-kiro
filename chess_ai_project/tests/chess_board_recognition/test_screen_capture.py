@@ -26,12 +26,26 @@ class TestScreenCapture:
         # 创建测试配置 (使用正斜杠避免YAML转义问题)
         save_path = str(Path(self.temp_dir) / "captures").replace("\\", "/")
         config_content = f"""
+model:
+  confidence_threshold: 0.5
+  nms_threshold: 0.4
+  model_path: "models/chess_detection.pt"
+
 capture:
   save_path: "{save_path}"
   format: "jpg"
   quality: 95
   max_storage_gb: 1
   region: [100, 100, 400, 300]
+
+training:
+  epochs: 100
+  batch_size: 16
+  learning_rate: 0.001
+
+logging:
+  level: "INFO"
+  file: "logs/chess_recognition.log"
 """
         with open(self.config_file, 'w', encoding='utf-8') as f:
             f.write(config_content)
