@@ -6,7 +6,7 @@
 
 from .chess_board import ChessBoard
 from .move import Move
-# RuleEngine将在后续任务中实现
-# from .rule_engine import RuleEngine
+from .board_validator import BoardValidator
+from .rule_engine import RuleEngine
 
-__all__ = ['ChessBoard', 'Move']
+__all__ = ['ChessBoard', 'Move', 'BoardValidator', 'RuleEngine']

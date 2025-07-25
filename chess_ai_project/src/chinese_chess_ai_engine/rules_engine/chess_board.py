@@ -7,7 +7,9 @@
 import numpy as np
 import json
 import copy
-from typing import List, Optional, Tuple, Dict, Any
+import pickle
+import hashlib
+from typing import List, Optional, Tuple, Dict, Any, Union
 from .move import Move
 
 
@@ -68,6 +70,15 @@ class ChessBoard:
         
         # 棋局状态历史 (用于检测重复局面)
         self.board_history: List[np.ndarray] = []
+        
+        # 棋局元数据
+        self.metadata: Dict[str, Any] = {
+            'created_at': None,
+            'game_id': None,
+            'round_count': 0,
+            'last_capture_round': 0,  # 最后一次吃子的回合数
+            'repetition_count': {}    # 局面重复计数
+        }
         
         if fen:
             self.from_fen(fen)
@@ -217,10 +228,15 @@ class ChessBoard:
         captured_piece = new_board.board[to_row, to_col]
         if captured_piece != 0:
             move.captured_piece = captured_piece
+            # 更新最后吃子回合
+            new_board.metadata['last_capture_round'] = len(new_board.move_history)
         
         # 移动棋子
         new_board.board[to_row, to_col] = new_board.board[from_row, from_col]
         new_board.board[from_row, from_col] = 0
+        
+        # 更新回合计数
+        new_board.metadata['round_count'] = len(new_board.move_history) + 1
         
         # 切换玩家
         new_board.current_player = -new_board.current_player
@@ -228,6 +244,12 @@ class ChessBoard:
         # 记录历史
         new_board.move_history.append(move)
         new_board.board_history.append(new_board.board.copy())
+        
+        # 更新重复局面计数
+        board_hash = new_board.get_board_hash()
+        if board_hash not in new_board.metadata['repetition_count']:
+            new_board.metadata['repetition_count'][board_hash] = 0
+        new_board.metadata['repetition_count'][board_hash] += 1
         
         return new_board
     
@@ -250,9 +272,31 @@ class ChessBoard:
         # 恢复棋盘状态
         if new_board.board_history:
             new_board.board = new_board.board_history[-1].copy()
+        else:
+            # 如果没有历史状态，重置为初始状态
+            new_board._setup_initial_position()
+        
+        # 更新回合计数
+        new_board.metadata['round_count'] = len(new_board.move_history)
+        
+        # 重新计算最后吃子回合
+        new_board.metadata['last_capture_round'] = 0
+        for i, move in enumerate(new_board.move_history):
+            if move.captured_piece is not None:
+                new_board.metadata['last_capture_round'] = i
         
         # 切换玩家
         new_board.current_player = -new_board.current_player
+        
+        # 重新计算重复局面计数
+        new_board.metadata['repetition_count'] = {}
+        temp_board = ChessBoard()
+        for move in new_board.move_history:
+            temp_board = temp_board.make_move(move)
+            board_hash = temp_board.get_board_hash()
+            if board_hash not in new_board.metadata['repetition_count']:
+                new_board.metadata['repetition_count'][board_hash] = 0
+            new_board.metadata['repetition_count'][board_hash] += 1
         
         return new_board
     
@@ -418,3 +462,340 @@ class ChessBoard:
     def __hash__(self) -> int:
         """哈希值计算"""
         return hash((self.board.tobytes(), self.current_player))
+    
+    # ==================== 序列化和反序列化功能 ====================
+    
+    def to_binary(self) -> bytes:
+        """
+        转换为二进制格式
+        
+        Returns:
+            bytes: 二进制数据
+        """
+        data = {
+            'board': self.board,
+            'current_player': self.current_player,
+            'move_history': self.move_history,
+            'metadata': self.metadata
+        }
+        return pickle.dumps(data)
+    
+    @classmethod
+    def from_binary(cls, binary_data: bytes) -> 'ChessBoard':
+        """
+        从二进制格式创建棋盘对象
+        
+        Args:
+            binary_data: 二进制数据
+            
+        Returns:
+            ChessBoard: 棋盘对象
+        """
+        data = pickle.loads(binary_data)
+        
+        board = cls()
+        board.board = data['board']
+        board.current_player = data['current_player']
+        board.move_history = data['move_history']
+        board.metadata = data.get('metadata', {})
+        
+        # 重建棋局历史
+        board.board_history = [board.board.copy()]
+        temp_board = board.board.copy()
+        
+        for i, move in enumerate(board.move_history):
+            # 重建每一步的棋局状态
+            if i > 0:
+                prev_move = board.move_history[i-1]
+                # 执行前一步走法来重建状态
+                from_row, from_col = prev_move.from_pos
+                to_row, to_col = prev_move.to_pos
+                temp_board[to_row, to_col] = temp_board[from_row, from_col]
+                temp_board[from_row, from_col] = 0
+                board.board_history.append(temp_board.copy())
+        
+        return board
+    
+    def save_to_file(self, filepath: str, format: str = 'json') -> None:
+        """
+        保存棋局到文件
+        
+        Args:
+            filepath: 文件路径
+            format: 保存格式 ('json', 'binary', 'fen')
+        """
+        if format == 'json':
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(self.to_json())
+        elif format == 'binary':
+            with open(filepath, 'wb') as f:
+                f.write(self.to_binary())
+        elif format == 'fen':
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(self.to_fen())
+        else:
+            raise ValueError(f"不支持的格式: {format}")
+    
+    @classmethod
+    def load_from_file(cls, filepath: str, format: str = 'auto') -> 'ChessBoard':
+        """
+        从文件加载棋局
+        
+        Args:
+            filepath: 文件路径
+            format: 文件格式 ('json', 'binary', 'fen', 'auto')
+            
+        Returns:
+            ChessBoard: 棋盘对象
+        """
+        if format == 'auto':
+            # 根据文件扩展名自动判断格式
+            if filepath.endswith('.json'):
+                format = 'json'
+            elif filepath.endswith('.bin') or filepath.endswith('.pkl'):
+                format = 'binary'
+            elif filepath.endswith('.fen'):
+                format = 'fen'
+            else:
+                # 尝试读取文件内容判断格式
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as f:
+                        content = f.read().strip()
+                        if content.startswith('{'):
+                            format = 'json'
+                        else:
+                            format = 'fen'
+                except:
+                    format = 'binary'
+        
+        if format == 'json':
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return cls.from_json(f.read())
+        elif format == 'binary':
+            with open(filepath, 'rb') as f:
+                return cls.from_binary(f.read())
+        elif format == 'fen':
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return cls(fen=f.read().strip())
+        else:
+            raise ValueError(f"不支持的格式: {format}")
+    
+    # ==================== 棋局验证功能 ====================
+    
+    def validate_board_state(self) -> Tuple[bool, List[str]]:
+        """
+        验证棋局状态的合法性
+        
+        Returns:
+            Tuple[bool, List[str]]: (是否合法, 错误信息列表)
+        """
+        # 使用专门的验证器进行验证
+        from .board_validator import BoardValidator
+        validator = BoardValidator()
+        return validator.full_validation(self)
+    
+    def get_validation_report(self) -> Dict[str, Any]:
+        """
+        获取详细的验证报告
+        
+        Returns:
+            Dict[str, Any]: 验证报告
+        """
+        from .board_validator import BoardValidator
+        validator = BoardValidator()
+        return validator.get_validation_report(self)
+    
+    def get_board_hash(self) -> str:
+        """
+        获取棋局状态的哈希值
+        
+        Returns:
+            str: 棋局状态的MD5哈希值
+        """
+        # 将棋盘状态和当前玩家组合成字符串
+        state_str = f"{self.board.tobytes()}{self.current_player}"
+        return hashlib.md5(state_str.encode()).hexdigest()
+    
+    def is_repetition(self, max_repetitions: int = 3) -> bool:
+        """
+        检查是否出现重复局面
+        
+        Args:
+            max_repetitions: 最大重复次数
+            
+        Returns:
+            bool: 是否达到重复次数限制
+        """
+        current_hash = self.get_board_hash()
+        
+        # 更新重复计数
+        if current_hash not in self.metadata['repetition_count']:
+            self.metadata['repetition_count'][current_hash] = 0
+        
+        self.metadata['repetition_count'][current_hash] += 1
+        
+        return self.metadata['repetition_count'][current_hash] >= max_repetitions
+    
+    # ==================== 走法历史管理 ====================
+    
+    def get_move_count(self) -> int:
+        """
+        获取走法总数
+        
+        Returns:
+            int: 走法总数
+        """
+        return len(self.move_history)
+    
+    def get_last_move(self) -> Optional[Move]:
+        """
+        获取最后一步走法
+        
+        Returns:
+            Optional[Move]: 最后一步走法，如果没有则返回None
+        """
+        return self.move_history[-1] if self.move_history else None
+    
+    def get_move_at(self, index: int) -> Optional[Move]:
+        """
+        获取指定索引的走法
+        
+        Args:
+            index: 走法索引
+            
+        Returns:
+            Optional[Move]: 指定的走法，如果索引无效则返回None
+        """
+        if 0 <= index < len(self.move_history):
+            return self.move_history[index]
+        return None
+    
+    def get_moves_since(self, round_number: int) -> List[Move]:
+        """
+        获取从指定回合开始的所有走法
+        
+        Args:
+            round_number: 起始回合数
+            
+        Returns:
+            List[Move]: 走法列表
+        """
+        if round_number < 0 or round_number >= len(self.move_history):
+            return []
+        
+        return self.move_history[round_number:]
+    
+    def clear_history_after(self, round_number: int) -> None:
+        """
+        清除指定回合之后的历史记录
+        
+        Args:
+            round_number: 保留到的回合数
+        """
+        if 0 <= round_number < len(self.move_history):
+            self.move_history = self.move_history[:round_number + 1]
+            self.board_history = self.board_history[:round_number + 2]  # 包含初始状态
+    
+    def replay_moves(self, moves: List[Move]) -> 'ChessBoard':
+        """
+        重放一系列走法
+        
+        Args:
+            moves: 要重放的走法列表
+            
+        Returns:
+            ChessBoard: 重放后的棋盘状态
+        """
+        # 从当前状态开始重放
+        result_board = copy.deepcopy(self)
+        
+        for move in moves:
+            result_board = result_board.make_move(move)
+        
+        return result_board
+    
+    # ==================== 实用工具方法 ====================
+    
+    def copy(self) -> 'ChessBoard':
+        """
+        创建棋盘的深拷贝
+        
+        Returns:
+            ChessBoard: 棋盘副本
+        """
+        return copy.deepcopy(self)
+    
+    def reset_to_initial(self) -> None:
+        """重置到初始局面"""
+        self.__init__()
+    
+    def get_all_pieces(self, player: Optional[int] = None) -> List[Tuple[Tuple[int, int], int]]:
+        """
+        获取所有棋子的位置和类型
+        
+        Args:
+            player: 指定玩家，None表示获取所有棋子
+            
+        Returns:
+            List[Tuple[Tuple[int, int], int]]: [(位置, 棋子类型), ...]
+        """
+        pieces = []
+        
+        for row in range(10):
+            for col in range(9):
+                piece = self.board[row, col]
+                if piece != 0:
+                    if player is None or (piece > 0) == (player > 0):
+                        pieces.append(((row, col), piece))
+        
+        return pieces
+    
+    def count_pieces(self, player: Optional[int] = None) -> Dict[int, int]:
+        """
+        统计棋子数量
+        
+        Args:
+            player: 指定玩家，None表示统计所有棋子
+            
+        Returns:
+            Dict[int, int]: {棋子类型: 数量}
+        """
+        counts = {}
+        
+        for row in range(10):
+            for col in range(9):
+                piece = self.board[row, col]
+                if piece != 0:
+                    if player is None or (piece > 0) == (player > 0):
+                        counts[piece] = counts.get(piece, 0) + 1
+        
+        return counts
+    
+    def get_material_value(self, player: int) -> int:
+        """
+        计算指定玩家的棋子总价值
+        
+        Args:
+            player: 玩家
+            
+        Returns:
+            int: 棋子总价值
+        """
+        # 棋子价值表
+        piece_values = {
+            1: 10000, -1: 10000,  # 帅/将
+            2: 200, -2: 200,      # 仕/士
+            3: 200, -3: 200,      # 相/象
+            4: 400, -4: 400,      # 马
+            5: 900, -5: 900,      # 车
+            6: 450, -6: 450,      # 炮
+            7: 100, -7: 100       # 兵/卒
+        }
+        
+        total_value = 0
+        pieces = self.get_all_pieces(player)
+        
+        for pos, piece in pieces:
+            total_value += piece_values.get(piece, 0)
+        
+        return total_value
