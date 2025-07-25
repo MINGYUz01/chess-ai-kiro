@@ -14,6 +14,8 @@ import copy
 
 from .mcts_node import MCTSNode, MCTSConfig
 from .mcts_searcher import MCTSSearcher
+from .time_manager import TimeManager, TimeAllocation, AdaptiveTimeManager
+from .search_optimizer import SearchOptimizer, SearchMetrics
 from ..rules_engine import ChessBoard, Move
 from ..neural_network import ChessNet, InferenceEngine
 
@@ -30,7 +32,9 @@ class ParallelSearcher:
         model: ChessNet,
         num_workers: int = 4,
         config: Optional[MCTSConfig] = None,
-        shared_inference_engine: bool = True
+        shared_inference_engine: bool = True,
+        enable_time_management: bool = True,
+        enable_optimization: bool = True
     ):
         """
         初始化并行搜索器
@@ -70,6 +74,20 @@ class ParallelSearcher:
         
         # 设置日志
         self.logger = logging.getLogger(__name__)
+        
+        # 时间管理
+        self.enable_time_management = enable_time_management
+        if enable_time_management:
+            self.time_manager = AdaptiveTimeManager()
+        else:
+            self.time_manager = None
+        
+        # 性能优化
+        self.enable_optimization = enable_optimization
+        if enable_optimization:
+            self.optimizer = SearchOptimizer()
+        else:
+            self.optimizer = None
         
         # 统计信息
         self.stats = {
