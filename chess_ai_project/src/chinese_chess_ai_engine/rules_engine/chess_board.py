@@ -798,4 +798,88 @@ class ChessBoard:
         for pos, piece in pieces:
             total_value += piece_values.get(piece, 0)
         
-        return total_value
+        return total_value   
+ 
+    # ==================== 游戏状态检测方法 ====================
+    
+    def get_legal_moves(self, player: Optional[int] = None) -> List[Move]:
+        """
+        获取合法走法列表
+        
+        Args:
+            player: 指定玩家，None表示当前玩家
+            
+        Returns:
+            List[Move]: 合法走法列表
+        """
+        from .rule_engine import RuleEngine
+        
+        if not hasattr(self, '_rule_engine'):
+            self._rule_engine = RuleEngine()
+        
+        return self._rule_engine.generate_legal_moves(self, player)
+    
+    def is_game_over(self) -> bool:
+        """
+        检查游戏是否结束
+        
+        Returns:
+            bool: 游戏是否结束
+        """
+        # 检查是否有合法走法
+        legal_moves = self.get_legal_moves()
+        if not legal_moves:
+            return True
+        
+        # 检查是否达到最大重复次数
+        if self.is_repetition(max_repetitions=3):
+            return True
+        
+        # 检查是否达到50回合规则（无吃子）
+        current_round = self.metadata.get('round_count', 0)
+        last_capture_round = self.metadata.get('last_capture_round', 0)
+        if current_round - last_capture_round >= 100:  # 50回合 = 100步
+            return True
+        
+        return False
+    
+    def get_winner(self) -> int:
+        """
+        获取游戏获胜者
+        
+        Returns:
+            int: 获胜者 (1: 红方, -1: 黑方, 0: 平局)
+        """
+        if not self.is_game_over():
+            return 0  # 游戏未结束
+        
+        # 检查是否有合法走法
+        legal_moves = self.get_legal_moves()
+        if not legal_moves:
+            # 检查是否被将军
+            from .rule_engine import RuleEngine
+            if not hasattr(self, '_rule_engine'):
+                self._rule_engine = RuleEngine()
+            
+            if self._rule_engine.is_in_check(self, self.current_player):
+                # 被将死，对手获胜
+                return -self.current_player
+            else:
+                # 困毙，平局
+                return 0
+        
+        # 其他情况都是平局
+        return 0
+    
+    def is_legal_move(self, move: Move) -> bool:
+        """
+        检查走法是否合法
+        
+        Args:
+            move: 要检查的走法
+            
+        Returns:
+            bool: 走法是否合法
+        """
+        legal_moves = self.get_legal_moves()
+        return move in legal_moves
