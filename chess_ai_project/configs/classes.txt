@@ -1,0 +1,16 @@
+board
+red_king
+red_advisor
+red_bishop
+red_knight
+red_rook
+red_cannon
+red_pawn
+black_king
+black_advisor
+black_bishop
+black_knight
+black_rook
+black_cannon
+black_pawn
+selected_piece

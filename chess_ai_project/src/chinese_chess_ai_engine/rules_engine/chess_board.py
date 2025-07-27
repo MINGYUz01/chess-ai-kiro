@@ -883,3 +883,53 @@ class ChessBoard:
         """
         legal_moves = self.get_legal_moves()
         return move in legal_moves
+    
+    def is_checkmate(self, player: Optional[int] = None) -> bool:
+        """
+        检查指定玩家是否被将死
+        
+        Args:
+            player: 要检查的玩家，如果为None则检查当前玩家
+            
+        Returns:
+            bool: 是否被将死
+        """
+        if player is None:
+            player = self.current_player
+        
+        # 检查是否有合法走法
+        legal_moves = self.get_legal_moves(player)
+        if legal_moves:
+            return False  # 有合法走法，不是将死
+        
+        # 没有合法走法，检查是否被将军
+        from .rule_engine import RuleEngine
+        if not hasattr(self, '_rule_engine'):
+            self._rule_engine = RuleEngine()
+        
+        return self._rule_engine.is_in_check(self, player)
+    
+    def is_stalemate(self, player: Optional[int] = None) -> bool:
+        """
+        检查指定玩家是否被困毙
+        
+        Args:
+            player: 要检查的玩家，如果为None则检查当前玩家
+            
+        Returns:
+            bool: 是否被困毙
+        """
+        if player is None:
+            player = self.current_player
+        
+        # 检查是否有合法走法
+        legal_moves = self.get_legal_moves(player)
+        if legal_moves:
+            return False  # 有合法走法，不是困毙
+        
+        # 没有合法走法，检查是否被将军
+        from .rule_engine import RuleEngine
+        if not hasattr(self, '_rule_engine'):
+            self._rule_engine = RuleEngine()
+        
+        return not self._rule_engine.is_in_check(self, player)

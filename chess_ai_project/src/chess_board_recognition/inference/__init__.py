@@ -8,10 +8,36 @@
 - 棋局状态输出
 """
 
-from .chessboard_detector import ChessboardDetectorImpl
-from .result_processor import ResultProcessor
+# 导入检测器相关类
+from .chessboard_detector import (
+    ChessboardDetector, 
+    DetectionBox, 
+    ImagePreprocessor
+)
+
+# 导入映射器相关类
+from .board_mapper import BoardMapper
+
+# 导入结果处理器相关类
+from .result_processor import (
+    ResultProcessor,
+    QualityMetrics,
+    StateValidator,
+    ConfidenceCalculator
+)
 
 __all__ = [
-    "ChessboardDetectorImpl",
-    "ResultProcessor",
+    # 核心检测器
+    'ChessboardDetector',
+    'DetectionBox',
+    'ImagePreprocessor',
+    
+    # 棋盘映射
+    'BoardMapper',
+    
+    # 结果处理
+    'ResultProcessor',
+    'QualityMetrics',
+    'StateValidator',
+    'ConfidenceCalculator'
 ]

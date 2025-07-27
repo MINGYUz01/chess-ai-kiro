@@ -142,3 +142,26 @@ class Move:
     def __hash__(self) -> int:
         """哈希值计算"""
         return hash((self.from_pos, self.to_pos, self.piece))
+    
+    def to_dict(self) -> dict:
+        """转换为字典"""
+        return {
+            'from_pos': self.from_pos,
+            'to_pos': self.to_pos,
+            'piece': self.piece,
+            'captured_piece': self.captured_piece,
+            'is_check': self.is_check,
+            'is_checkmate': self.is_checkmate
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> 'Move':
+        """从字典创建Move对象"""
+        return cls(
+            from_pos=tuple(data['from_pos']),
+            to_pos=tuple(data['to_pos']),
+            piece=data['piece'],
+            captured_piece=data.get('captured_piece'),
+            is_check=data.get('is_check', False),
+            is_checkmate=data.get('is_checkmate', False)
+        )

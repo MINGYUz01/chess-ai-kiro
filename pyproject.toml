@@ -83,6 +83,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-asyncio>=0.21.0",
     "pytest-mock>=3.11.0",
+    "httpx>=0.24.0",  # FastAPI测试客户端需要
     
     # 代码质量
     "black>=23.0.0",

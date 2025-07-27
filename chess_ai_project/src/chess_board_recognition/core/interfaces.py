@@ -59,6 +59,44 @@ class Detection:
 
 
 @dataclass
+class BoardPosition:
+    """棋盘位置数据结构"""
+    x: float
+    y: float
+    row: int
+    col: int
+    occupied: bool = False
+    piece_type: Optional[str] = None
+    confidence: float = 0.0
+
+
+@dataclass
+class DetectionResult:
+    """检测结果数据结构"""
+    image: np.ndarray
+    detections: List
+    confidence_threshold: float
+    processing_time: float
+    metadata: Dict = None
+    
+    def __post_init__(self):
+        if self.metadata is None:
+            self.metadata = {}
+
+
+@dataclass
+class ChessboardState:
+    """棋盘状态数据结构"""
+    board_matrix: np.ndarray
+    board_corners: Tuple
+    grid_points: List[List[BoardPosition]]
+    selected_position: Optional[Tuple[int, int]]
+    validation_result: Dict
+    detection_count: Dict
+    confidence_stats: Dict
+
+
+@dataclass
 class BoardState:
     """棋局状态数据结构"""
     matrix: np.ndarray  # 10x9 棋局矩阵

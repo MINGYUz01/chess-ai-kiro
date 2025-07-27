@@ -8,7 +8,20 @@ import json
 import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional
+from dataclasses import dataclass
 from .interfaces import DEFAULT_CONFIG, ChessboardRecognitionError
+
+
+@dataclass
+class InferenceConfig:
+    """推理配置类"""
+    input_size: int = 640
+    confidence_threshold: float = 0.5
+    nms_threshold: float = 0.4
+    overlap_threshold: float = 0.5
+    device: str = 'auto'
+    batch_size: int = 1
+    max_detections: int = 100
 
 
 class ConfigManager:
